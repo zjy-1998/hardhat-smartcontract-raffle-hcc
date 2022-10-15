@@ -36,19 +36,28 @@ developmentChains.includes(network.name)
                               const endingTimeStamp = await raffle.getLatestTimeStamp()
 
                               await expect(raffle.getPlayer(0)).to.be.reverted // ?
-                              assert(
-                                  recentWinner.toString() == accounts[0].address,
-                                  raffleState.toString() == "0",
-                                  winnerEndingBalance.toString() ==
-                                      winnerStartingBalance.add(raffleEntranceFee).toString(),
-                                  startingTimeStamp < endingTimeStamp
+                              assert.equal(recentWinner.toString(), accounts[0].address)
+                              assert.equal(raffleState, 0)
+                              assert.equal(
+                                  winnerEndingBalance.toString(),
+                                  winnerStartingBalance.add(raffleEntranceFee).toString()
                               )
+                              assert(endingTimeStamp > startingTimeStamp)
                               resolve()
                           } catch (error) {
                               console.log(error)
                               reject(e)
                           }
                       })
+
+                      console.log("Entering the raffle...")
+                      const tx = await raffle.enterRaffle({ value: raffleEntranceFee })
+                      await tx.wait(1)
+                      console.log("Okay, time to wait...")
+                      const winnerStartingBalance = await accounts[0].getBalance()
+
+                      /*
+
                       const SubId = await raffle.getSubscriptionId() // 1
                       console.log(`SubId:${SubId}`)
                       console.log("Entering Raffle...")
@@ -71,6 +80,8 @@ developmentChains.includes(network.name)
                       // and this code WONT complete until our listener has finished listening!
 
                       // checkUpkeep(), performUpkeep() and fulfillRamdonWords() will be kicked off by Chainlink Keeoers and Chainlink VRF
+                      
+                      */
                   })
               })
           })
